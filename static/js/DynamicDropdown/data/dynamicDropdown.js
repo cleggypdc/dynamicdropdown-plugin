@@ -27,15 +27,23 @@ pimcore.object.classes.data.dynamicDropdown = Class.create(pimcore.object.classe
         objectbrick: true,
         fieldcollection: true,
         localizedfield: true
-    },		
+    },
+
+    allowedClassStore: null,
 
     initialize: function (treeNode, initData) {
         this.type = "dynamicDropdown";
 
         this.initData(initData);
-
         this.treeNode = treeNode;
-        this.id = this.type + "_" + treeNode.attributes.id;
+
+        try {
+            this.id = this.type + "_" + treeNode.getId();
+        } catch(e) {
+            //fallback for ext 3x
+            this.id = this.type + "_" + treeNode.attributes.id;
+        }
+
     },
 
     getTypeName: function () {
@@ -71,6 +79,7 @@ pimcore.object.classes.data.dynamicDropdown = Class.create(pimcore.object.classe
             name: "source_parentid",
             cls: "input_drop_target",
             value: this.datax.source_parentid,
+            allowEmpty: false,
             listeners: {
                 "render": function (el) {
                     new Ext.dd.DropZone(el.getEl(), {
@@ -81,23 +90,40 @@ pimcore.object.classes.data.dynamicDropdown = Class.create(pimcore.object.classe
                         }.bind(el),
 
                         onNodeOver : function(target, dd, e, data) {
-                            if (data.node.attributes.type == "folder") {
-                                return Ext.dd.DropZone.prototype.dropAllowed;
+
+                            try {
+                                if (data.records.first().get('type') === "folder") {
+                                    return Ext.dd.DropZone.prototype.dropAllowed;
+                                }
+                            } catch(e) {
+                                //fallback for < pimcore 4
+                                if (data.node.attributes.type === "folder") {
+                                    return Ext.dd.DropZone.prototype.dropAllowed;
+                                }
                             }
+
                             return Ext.dd.DropZone.prototype.dropNotAllowed;
                         },
 
                         onNodeDrop : function (target, dd, e, data) {
-                            if (data.node.attributes.type == "folder") {
-                                this.setValue(data.node.attributes.path);
-                                return true;
+                            try {
+                                if (data.records.first().get('type') === "folder") {
+                                    this.setValue(data.records.first().get('path'));
+                                    return true;
+                                }
+                            } catch(e) {
+                                //fallback for < pimcore 4
+                                if (data.node.attributes.type == "folder") {
+                                    this.setValue(data.node.attributes.path);
+                                    return true;
+                                }
                             }
                             return false;
                         }.bind(el)
                     });
                 }
             }
-								
+
         }
         ]);
 
@@ -123,6 +149,30 @@ pimcore.object.classes.data.dynamicDropdown = Class.create(pimcore.object.classe
             }
         ]);
 
+        //there's that much difference between 3.4 and 6 even the version checks are awkward :-(
+        if(pimcore.settings.build > 3546) {
+            var allowed_class_store = Ext.create('Ext.data.JsonStore', {
+                autoLoad: true,
+                proxy: {
+                    type: 'ajax',
+                    url: '/admin/class/get-tree',
+                    reader: {
+                        type: 'json'
+                    }
+                },
+                storeId: 'dd_allowed_classes',
+                fields: ['text','id']
+            });
+
+        } else {
+            //fallback for ext3
+            var allowed_class_store = new Ext.data.JsonStore({
+                url: '/admin/class/get-tree',
+                fields: ["text","id"]
+            });
+
+        }
+
         var classname_combobox = this.specificPanel.add([
         {
             xtype: "combo",
@@ -133,32 +183,28 @@ pimcore.object.classes.data.dynamicDropdown = Class.create(pimcore.object.classe
             listWidth: 'auto',
             triggerAction: 'all',
             editable: false,
-            store: new Ext.data.JsonStore({
-                url: '/admin/class/get-tree',
-                fields: ["text","id"]
-            }),
+            store: allowed_class_store,
             displayField: "text",
             valueField: "text",
-            summaryDisplay:true,
+            queryMode: 'local',
+            forceSelection: true,
             value: this.datax.source_classname,
 
             listeners: {
                 expand: {
-                    fn:function(combo, value) {
+                    fn: function(combo, value) {
                         var methodnames = Ext.getCmp(this.method_id);
                         methodnames.disable();
                     }
                 },
                 collapse: {
-                    fn:function(combo, value) {
+                    fn: function(combo, value) {
                         var methodnames = Ext.getCmp(this.method_id);
 
                         var loadDone = function(store, records, options) {
                             store.un("load", loadDone);
-                            methodnames.render();
                             methodnames.enable();
-
-                        }
+                        };
 
                         methodnames.store.on("load", loadDone);
                         methodnames.store.reload({
@@ -166,7 +212,6 @@ pimcore.object.classes.data.dynamicDropdown = Class.create(pimcore.object.classe
                                 classname: combo.getValue()
                             }
                         });
-                        methodnames.store.baseParams.classname = combo.getValue();
                         methodnames.setValue("");
                     }
                 }
@@ -175,6 +220,37 @@ pimcore.object.classes.data.dynamicDropdown = Class.create(pimcore.object.classe
             }
         }
         ]);
+
+        if (pimcore.settings.build > 3546) {
+
+            var methodnames_store = Ext.create('Ext.data.JsonStore', {
+                autoLoad: true,
+                proxy: {
+                    type: 'ajax',
+                    url: '/plugin/DynamicdropdownPlugin/dynamicdropdown/methods',
+                    reader: {
+                        type: 'json'
+                    },
+                    extraParams: {
+                        classname: Ext.getCmp(this.id + "_classname").getValue()
+                    }
+                },
+                storeId: 'dd_method_names',
+                fields: ['key','value']
+            });
+
+        } else {
+
+            var methodnames_store = new Ext.data.JsonStore({
+                url: '/plugin/DynamicdropdownPlugin/dynamicdropdown/methods',
+                fields: ["key","value"],
+                baseParams: {
+                    classname: Ext.getCmp(this.id + "_classname").getValue()
+                }
+            });
+
+        }
+
         this.specificPanel.add([
         {
             xtype: "combo",
@@ -184,16 +260,11 @@ pimcore.object.classes.data.dynamicDropdown = Class.create(pimcore.object.classe
             listWidth: 'auto',
             triggerAction: 'all',
             editable: false,
-            store: new Ext.data.JsonStore({
-                url: '/plugin/DynamicdropdownPlugin/dynamicdropdown/methods',
-                fields: ["key","value"],
-                baseParams: {
-                    classname: Ext.getCmp(this.id + "_classname").getValue()
-                    }
-            }),
+            store: methodnames_store,
             displayField: "value",
             valueField: "key",
-            summaryDisplay:true,
+            queryMode: 'local',
+            forceSelection: true,
             value: this.datax.source_methodname
         }
 

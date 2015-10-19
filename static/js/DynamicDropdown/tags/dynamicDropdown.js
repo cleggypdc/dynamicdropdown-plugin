@@ -36,31 +36,65 @@ pimcore.object.tags.dynamicDropdown = Class.create(pimcore.object.tags.select, {
     },
     
     getLayoutEdit: function () {
-        // generate store
-        options_store = new Ext.data.Store({
-            proxy: new Ext.data.HttpProxy({
-                url: '/plugin/DynamicdropdownPlugin/dynamicdropdown/options'
-            }),
-            baseParams: {
-                source_parent: this.fieldConfig.source_parentid,
-                source_methodname: this.fieldConfig.source_methodname,
-                source_classname: this.fieldConfig.source_classname,
-                source_recursive: this.fieldConfig.source_recursive,
-                current_language: pimcore.settings.language,
-                sort_by: this.fieldConfig.sort_by
-            },
-            autoLoad: true,
-            loading: true,
-            reader: new Ext.data.JsonReader({
-                //root: 'data'
-            }, [{name: 'value'}, {name: 'key'}]),
-            listeners: {
-                "load": function(store) {
-                    console.log(this);
-                    this.component.setValue(this.data);
-                }.bind(this)
-            }
-        });
+
+
+        if(pimcore.settings.build > 3546) {
+
+            var options_store = Ext.create('Ext.data.JsonStore', {
+               proxy: {
+                   type: 'ajax',
+                   url: '/plugin/DynamicdropdownPlugin/dynamicdropdown/options',
+                   reader: {
+                       type: 'json',
+                   },
+                   extraParams: {
+                       source_parent: this.fieldConfig.source_parentid,
+                       source_methodname: this.fieldConfig.source_methodname,
+                       source_classname: this.fieldConfig.source_classname,
+                       source_recursive: this.fieldConfig.source_recursive,
+                       current_language: pimcore.settings.language,
+                       sort_by: this.fieldConfig.sort_by
+                   }
+               },
+                autoLoad: true,
+                listeners: {
+                    "load": function (store) {
+                        this.component.setValue(this.data);
+                    }.bind(this)
+                },
+                fields: ['value', 'key']
+            });
+
+        } else {
+            //fallback
+            // generate store
+            var options_store = new Ext.data.Store({
+                proxy: new Ext.data.HttpProxy({
+                    url: '/plugin/DynamicdropdownPlugin/dynamicdropdown/options'
+                }),
+                baseParams: {
+                    source_parent: this.fieldConfig.source_parentid,
+                    source_methodname: this.fieldConfig.source_methodname,
+                    source_classname: this.fieldConfig.source_classname,
+                    source_recursive: this.fieldConfig.source_recursive,
+                    current_language: pimcore.settings.language,
+                    sort_by: this.fieldConfig.sort_by
+                },
+                autoLoad: true,
+                loading: true,
+                reader: new Ext.data.JsonReader({
+                    //root: 'data'
+                }, [{name: 'value'}, {name: 'key'}]),
+                listeners: {
+                    "load": function (store)
+                    {
+                        console.log(this);
+                        this.component.setValue(this.data);
+                    }.bind(this)
+                }
+            });
+
+        }
 
         var options = {
             name: this.fieldConfig.name,
