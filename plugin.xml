@@ -37,6 +37,16 @@
             <path>/DynamicdropdownPlugin/static/js/DynamicDropdown/tags/itemselector.js</path>
             <path>/DynamicdropdownPlugin/static/js/DynamicDropdown/tags/superboxselect.js</path>
         </pluginJsPaths>
+        <pluginJsPaths-extjs6>
+            <path>/DynamicdropdownPlugin/static6/js/DynamicDropdown/data/dynamicDropdown.js</path>
+            <path>/DynamicdropdownPlugin/static6/js/DynamicDropdown/data/dynamicDropdownMultiple.js</path>
+            <path>/DynamicdropdownPlugin/static6/js/DynamicDropdown/data/itemselector.js</path>
+            <path>/DynamicdropdownPlugin/static6/js/DynamicDropdown/data/superboxselect.js</path>
+            <path>/DynamicdropdownPlugin/static6/js/DynamicDropdown/tags/dynamicDropdown.js</path>
+            <path>/DynamicdropdownPlugin/static6/js/DynamicDropdown/tags/dynamicDropdownMultiple.js</path>
+            <path>/DynamicdropdownPlugin/static6/js/DynamicDropdown/tags/itemselector.js</path>
+            <path>/DynamicdropdownPlugin/static6/js/DynamicDropdown/tags/superboxselect.js</path>
+        </pluginJsPaths-extjs6>
         <pluginIcon>/plugins/DynamicdropdownPlugin/static/img/dynamicdropdown-logo.png</pluginIcon>
     </plugin>
 </zend-config>

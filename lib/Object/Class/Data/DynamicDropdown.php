@@ -12,73 +12,73 @@
  * @license    http://www.pimcore.org/license     New BSD License
  */
 class Object_Class_Data_DynamicDropdown extends Object_Class_Data_Href {
-	
+
     /**
      * Static type of this element
      *
      * @var string
      */
     public $fieldtype = "dynamicDropdown";
-		
-		public $source_parentid;
-		public $source_classname;
-		public $source_methodname;
+
+    public $source_parentid;
+    public $source_classname;
+    public $source_methodname;
     public $source_recursive;
     public $sort_by;
-		
-		public function setsource_parentid($id) {
-			$this->source_parentid = $id;
-		}
-		
-		public function getsource_parentid() {
-			return $this->source_parentid;
-		}
-		
-		public function setsource_classname($classname) {
-			$this->source_classname = $classname;
-		}
-		
-		public function getsource_classname() {
-			return $this->source_classname;
-		}
-		
-		public function setsource_methodname($methodname) {
-			$this->source_methodname = $methodname;
-		}
-	
-		public function getsource_methodname() {
-			return $this->source_methodname;
-		}
+
+    public function setsource_parentid($id) {
+        $this->source_parentid = $id;
+    }
+
+    public function getsource_parentid() {
+        return $this->source_parentid;
+    }
+
+    public function setsource_classname($classname) {
+        $this->source_classname = $classname;
+    }
+
+    public function getsource_classname() {
+        return $this->source_classname;
+    }
+
+    public function setsource_methodname($methodname) {
+        $this->source_methodname = $methodname;
+    }
+
+    public function getsource_methodname() {
+        return $this->source_methodname;
+    }
 
     public function setsource_recursive($recursive) {
-      $this->source_recursive = $recursive;
+        $this->source_recursive = $recursive;
     }
 
     public function getsource_recursive() {
-      return $this->source_recursive;
+        return $this->source_recursive;
     }
 
-  public function setsort_by($sort_by) {
-    $this->sort_by = $sort_by;
-  }
+    public function setsort_by($sort_by) {
+        $this->sort_by = $sort_by;
+    }
 
-  public function getsort_by() {
-    return $this->sort_by;
-  }
+    public function getsort_by() {
+        return $this->sort_by;
+    }
 
-		
+
     public function getDataForEditmode($data, $object = null) {
-			if ($data) return $data->getId();
-			return;
-		}
-		
+        if ($data instanceof \Pimcore\Model\Object\AbstractObject) return $data->getId();
+        return;
+    }
+
     /**
      * @return boolean
      */
     public function getObjectsAllowed() {
-			return array("Object_".ucfirst($this->source_classname));
+        return array("Object_".ucfirst($this->source_classname));
     }
-		
+
     /**
      * @see Object_Class_Data::getDataFromEditmode
      * @param array $data
@@ -86,7 +86,7 @@ class Object_Class_Data_DynamicDropdown extends Object_Class_Data_Href {
      * @return Asset|Document|Object_Abstract
      */
     public function getDataFromEditmode($data, $object = null) {
-				return Element_Service::getElementById("object", $data);
+        return Element_Service::getElementById("object", $data);
     }
-		
+
 }
