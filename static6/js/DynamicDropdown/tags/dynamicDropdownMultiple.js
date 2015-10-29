@@ -20,7 +20,6 @@ pimcore.object.tags.dynamicDropdownMultiple = Class.create(pimcore.object.tags.m
 
         this.data = data;
         this.fieldConfig = fieldConfig;
-//        this.fieldConfig.width = 250;
         this.mode = 'remote';
 
         this.fieldConfig.index = 15006;
@@ -43,7 +42,7 @@ pimcore.object.tags.dynamicDropdownMultiple = Class.create(pimcore.object.tags.m
             }
         });
         
-        this.fieldConfig.options = remote_data;			 
+        this.fieldConfig.options = remote_data;
     },
 
     getGridColumnEditor:function (field) {

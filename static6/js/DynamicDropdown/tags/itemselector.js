@@ -57,7 +57,7 @@ pimcore.object.tags.itemselector = Class.create(pimcore.object.tags.multiselect,
 
     getLayoutEdit: function () {
 
-        var height = 200;
+        var height = 250;
         var values = [];
         if (typeof this.data == "string") {
             var values = this.data.split(",");
@@ -65,7 +65,7 @@ pimcore.object.tags.itemselector = Class.create(pimcore.object.tags.multiselect,
         var sort_by = this.fieldConfig.sort_by == "byvalue" ? "value" : "id";
 
         // generate store
-        var store_from =new Ext.data.ArrayStore({
+        var store_from = new Ext.data.ArrayStore({
             sortInfo: { field: sort_by, direction: "ASC" },
             fields: [
                 {name: "id", type: "int"},
@@ -86,73 +86,77 @@ pimcore.object.tags.itemselector = Class.create(pimcore.object.tags.multiselect,
             var key = this.fieldConfig.options[i].key;
 
             if (values.indexOf(value.toString()) >= 0) {
-                var record = new store_to.recordType({id: value, value: ts(key)});
+                var record = new store_to.model({id: value, value: ts(key)});
                 store_to.add(record);
             } else {
-                var record = new store_from.recordType({id: value, value: ts(key)});
+                var record = new store_from.model({id: value, value: ts(key)});
                 store_from.add(record);
             }
         }
+
         this.sortStore(store_from);
         this.sortStore(store_to);
 
-        var options_from = {
-            legend: 'Available',
+        this.fromMultiselect = new Ext.ux.form.MultiSelect({
             triggerAction: "all",
             editable: false,
             store: store_from,
             displayField: "value",
             itemCls: "object_field",
-            width: "99%",
             height: height,
-            border: true
-        };
+            border: false,
+            frame: false,
+            flex: 9
+        });
 
-        var options_to = {
-            legend: 'Selected',
+        this.toMultiselect = new Ext.ux.form.MultiSelect({
             triggerAction: "all",
             editable: false,
             store: store_to,
             displayField: "value",
             itemCls: "object_field",
-            width: "99%",
             height: height,
-            border: true
-        };
-
-        this.fromMultiselect = new Ext.ux.form.MultiSelect(options_from);
-        this.fromMultiselect.on('dblclick', this.onRowDblClick, this);
-
-        this.toMultiselect = new Ext.ux.form.MultiSelect(options_to);
-        this.toMultiselect.on('dblclick', this.onRowDblClick, this);
+            border: false,
+            frame: false,
+            flex: 9
+        });
 
         var hBox = new Ext.Panel({
-            border: false,
+            border: true,
             frame: false,
             width: this.fieldConfig.width,
             height: height,
-            fieldLabel: this.fieldConfig.title,
+            title: this.fieldConfig.title,
             layout: {
                 type: 'hbox',
                 align: 'stretch'
             },
-            items: [{
+            items: [
+                this.fromMultiselect, {
                 xtype: 'panel',
-                flex: 9,
-                items: [ this.fromMultiselect],
-                border: false
-            }, {
-                xtype: 'panel',
-                flex: 1,
-                border: false
-            }, {
-                xtype: 'panel',
-                flex: 9,
-                items: [ this.toMultiselect ],
-                border: false
-            }]
+                flex: 2,
+                cls: 'itemselector_buttons',
+                border: false,
+                layout: {
+                    type: 'vbox',
+                    pack: 'center'
+                },
+                items: [{
+                    xtype: 'button',
+                    text: '>>',
+                    handler: this.fromTo.bind(this)
+                },{
+                    xtype: 'container',
+                    height: 5
+                },{
+                    xtype: 'button',
+                    text: '<<',
+                    handler: this.toFrom.bind(this)
+                }]
+            }, this.toMultiselect
+            ]
 
-        })
+        });
 
         this.component = hBox;
         return this.component;
@@ -173,7 +177,7 @@ pimcore.object.tags.itemselector = Class.create(pimcore.object.tags.multiselect,
 
             var record = null;
             var values = [];
-            var store = this.toMultiselect.view.store;
+            var store = this.toMultiselect.store;
 
             for (var i=0; i<store.getCount(); i++) {
                 record = store.getAt(i);
@@ -205,67 +209,43 @@ pimcore.object.tags.itemselector = Class.create(pimcore.object.tags.multiselect,
 
     },
 
-    onRowDblClick : function(vw, index, node, e) {
-        if (vw == this.toMultiselect.view){
-            this.toFrom();
-        } else if (vw == this.fromMultiselect.view) {
-            this.fromTo();
-        }
-        //return this.fireEvent('rowdblclick', vw, index, node, e);
-    },
-
     fromTo : function() {
-        var selectionsArray = this.fromMultiselect.view.getSelectedIndexes();
-        var records = [];
-        if (selectionsArray.length > 0) {
-            for (var i=0; i<selectionsArray.length; i++) {
-                record = this.fromMultiselect.view.store.getAt(selectionsArray[i]);
-                records.push(record);
+        var selectionsArray = this.fromMultiselect.getSelected();
+
+        Ext.each(selectionsArray, function(record, index, length) {
+
+            if (this.allowDup) {
+                var x = new Ext.data.Record();
+                record.set('id', x.id);
+                delete x;
+                this.toMultiselect.store.add(record);
+            } else {
+                this.fromMultiselect.store.remove(record);
+                this.toMultiselect.store.add(record);
             }
-            if(!this.allowDup)selectionsArray = [];
-            for (var i=0; i<records.length; i++) {
-                record = records[i];
-                if(this.allowDup){
-                    var x=new Ext.data.Record();
-                    record.id=x.id;
-                    delete x;
-                    this.toMultiselect.view.store.add(record);
-                }else{
-                    this.fromMultiselect.view.store.remove(record);
-                    this.toMultiselect.view.store.add(record);
-                    selectionsArray.push((this.toMultiselect.view.store.getCount() - 1));
-                }
-            }
-        }
-        this.toMultiselect.view.refresh();
-        this.fromMultiselect.view.refresh();
+
+        }, this);
+
         this.sortStore(this.toMultiselect.store);
-        this.toMultiselect.view.select(selectionsArray);
+        //this.toMultiselect.select(selectionsArray);
         this.toMultiselect["__pimcore_dirty"] = true;
     },
 
     toFrom : function() {
-        var selectionsArray = this.toMultiselect.view.getSelectedIndexes();
-        var records = [];
-        if (selectionsArray.length > 0) {
-            for (var i=0; i<selectionsArray.length; i++) {
-                record = this.toMultiselect.view.store.getAt(selectionsArray[i]);
-                records.push(record);
+        var selectionsArray = this.toMultiselect.getSelected();
+
+        Ext.each(selectionsArray, function(record, index, length) {
+
+            this.toMultiselect.store.remove(record);
+
+            if(!this.allowDup){
+                this.fromMultiselect.store.add(record);
             }
-            selectionsArray = [];
-            for (var i=0; i<records.length; i++) {
-                record = records[i];
-                this.toMultiselect.view.store.remove(record);
-                if(!this.allowDup){
-                    this.fromMultiselect.view.store.add(record);
-                    selectionsArray.push((this.fromMultiselect.view.store.getCount() - 1));
-                }
-            }
-        }
-        this.fromMultiselect.view.refresh();
-        this.toMultiselect.view.refresh();
+
+        }, this);
+
         this.sortStore(this.fromMultiselect.store);
-        this.fromMultiselect.view.select(selectionsArray);
+        //this.fromMultiselect.select(selectionsArray);
         this.toMultiselect["__pimcore_dirty"] = true;
     },
 

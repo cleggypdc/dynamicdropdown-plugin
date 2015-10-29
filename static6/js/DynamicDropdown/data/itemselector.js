@@ -24,7 +24,7 @@ pimcore.object.classes.data.itemselector = Class.create(pimcore.object.classes.d
         this.initData(initData);
 
         this.treeNode = treeNode;
-        this.id = this.type + "_" + treeNode.attributes.id;
+        this.id = this.type + "_" + treeNode.getId();
     },
 
     getTypeName: function () {

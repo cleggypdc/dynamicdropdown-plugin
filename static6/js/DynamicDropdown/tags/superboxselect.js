@@ -78,7 +78,7 @@ pimcore.object.tags.superboxselect = Class.create(pimcore.object.tags.multihref,
         for (var i = 0; i < this.fieldConfig.options.length; i++) {
             var value = this.fieldConfig.options[i].value;
             var key = this.fieldConfig.options[i].key;
-            var record = new store.recordType({id: value, value: ts(key)});
+            var record = new store.model({id: value, value: ts(key)});
             store.add(record);
         }
 
