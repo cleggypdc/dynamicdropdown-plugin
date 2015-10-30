@@ -135,11 +135,13 @@ pimcore.object.tags.itemselector = Class.create(pimcore.object.tags.multiselect,
                 this.fromMultiselect, {
                 xtype: 'panel',
                 flex: 2,
-                cls: 'itemselector_buttons',
+                style: '',
+                //cls: 'itemselector_buttons',
                 border: false,
                 layout: {
                     type: 'vbox',
-                    pack: 'center'
+                    pack: 'center',
+                    align : 'middle'
                 },
                 items: [{
                     xtype: 'button',
