@@ -1,18 +1,21 @@
 <?php
 
 /**
- * This source file is subject to the new BSD license that is 
- * available through the world-wide-web at this URL:
- * http://www.pimcore.org/license
+ * DynamicDropdownMultiple
  *
- * @category   Pimcore
- * @package    Object_Class
- * @copyright  Copyright (c) 2011 Weblizards GbR (http://www.weblizards.de)
- * @author     Thomas Keil <thomas@weblizards.de>
- * @author     Thomas Akkermans <thomas.akkermans@amgate.com>
- * @license    http://www.pimcore.org/license     New BSD License
+ * This source file is subject to the GNU General Public License version 3 (GPLv3)
+ * For the full copyright and license information, please view the LICENSE.md
+ * file distributed with this source code.
+ *
+ * @category Pimcore
+ * @copyright  Copyright (c) 2015 Weblizards GmbH (http://www.weblizards.de)
+ * @author     Thomas Keil <thomas@weblizards.de> & Paul Clegg <paul@gatherdigital.co.uk>
+ * @license    http://www.pimcore.org/license    GNU General Public License version 3 (GPLv3)
  */
-class Object_Class_Data_DynamicDropdownMultiple extends Object_Class_Data_Multiselect
+
+namespace Pimcore\Model\Object\ClassDefinition\Data;
+
+class DynamicDropdownMultiple extends Multiselect
 {
     /**
      * Static type of this element
@@ -55,11 +58,11 @@ class Object_Class_Data_DynamicDropdownMultiple extends Object_Class_Data_Multis
     }
 
     public function setsource_recursive($recursive) {
-      $this->source_recursive = $recursive;
+        $this->source_recursive = $recursive;
     }
 
     public function getsource_recursive() {
-      return $this->source_recursive;
+        return $this->source_recursive;
     }
 
     /**
@@ -67,6 +70,6 @@ class Object_Class_Data_DynamicDropdownMultiple extends Object_Class_Data_Multis
      */
     public function getObjectsAllowed()
     {
-        return array("Object_" . ucfirst($this->source_classname));
+        return array("\\Pimcore\\Model\\Object\\" . ucfirst($this->source_classname));
     }
 }

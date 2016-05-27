@@ -1,17 +1,27 @@
-<?php 
+<?php
 
 /**
- * This source file is subject to the new BSD license that is 
- * available through the world-wide-web at this URL:
- * http://www.pimcore.org/license
+ * DynamicDropdown
  *
- * @category   Pimcore
- * @package    Object_Class
- * @copyright  Copyright (c) 2011 Weblizards GbR (http://www.weblizards.de)
- * @author     Thomas Keil <thomas@weblizards.de>
- * @license    http://www.pimcore.org/license     New BSD License
+ * This source file is subject to the GNU General Public License version 3 (GPLv3)
+ * For the full copyright and license information, please view the LICENSE.md
+ * file distributed with this source code.
+ *
+ * @category Pimcore
+ * @copyright  Copyright (c) 2015 Weblizards GmbH (http://www.weblizards.de)
+ * @author     Thomas Keil <thomas@weblizards.de> & Paul Clegg <paul@gatherdigital.co.uk>
+ * @license    http://www.pimcore.org/license    GNU General Public License version 3 (GPLv3)
  */
-class Object_Class_Data_DynamicDropdown extends Object_Class_Data_Href {
+
+
+namespace Pimcore\Model\Object\ClassDefinition\Data;
+
+use Pimcore\Model\Object;
+use Pimcore\Model\Asset;
+use Pimcore\Model\Document;
+use Pimcore\Model\Element;
+
+class DynamicDropdown extends Href {
 
     /**
      * Static type of this element
@@ -67,26 +77,29 @@ class Object_Class_Data_DynamicDropdown extends Object_Class_Data_Href {
     }
 
 
-    public function getDataForEditmode($data, $object = null) {
-        if ($data instanceof \Pimcore\Model\Object\AbstractObject) return $data->getId();
-        return;
+    public function getDataForEditmode($data, $object = null, $params = array()) {
+        if ($data instanceof Object\AbstractObject) {
+            return $data->getId();
+        }
+
+        return null;
     }
 
     /**
      * @return boolean
      */
     public function getObjectsAllowed() {
-        return array("Object_".ucfirst($this->source_classname));
+        return array("\\Pimcore\\Model\\Object\\".ucfirst($this->source_classname));
     }
 
     /**
-     * @see Object_Class_Data::getDataFromEditmode
+     * @see Object\ClassDefinition\Data::getDataFromEditmode
      * @param array $data
-     * @param null|Object_Abstract $object
-     * @return Asset|Document|Object_Abstract
+     * @param null|Object\AbstractObject $object
+     * @return Asset|Document|Object\AbstractObject
      */
     public function getDataFromEditmode($data, $object = null) {
-        return Element_Service::getElementById("object", $data);
+        return Element\Service::getElementById("object", $data);
     }
 
 }

@@ -1,13 +1,16 @@
 <?php
+
 /**
- * This source file is subject to the new BSD license that is 
- * available through the world-wide-web at this URL:
- * http://www.pimcore.org/license
+ * Plugin
  *
- * @category   Pimcore
+ * This source file is subject to the GNU General Public License version 3 (GPLv3)
+ * For the full copyright and license information, please view the LICENSE.md
+ * file distributed with this source code.
+ *
+ * @category Pimcore
  * @copyright  Copyright (c) 2015 Weblizards GmbH (http://www.weblizards.de)
- * @author     Thomas Keil <thomas@weblizards.de>
- * @license    http://www.pimcore.org/license     New BSD License
+ * @author     Thomas Keil <thomas@weblizards.de> & Paul Clegg <paul@gatherdigital.co.uk>
+ * @license    http://www.pimcore.org/license    GNU General Public License version 3 (GPLv3)
  */
 
 namespace DynamicdropdownPlugin;
@@ -20,14 +23,14 @@ use Pimcore\API;
 class Plugin extends API\Plugin\AbstractPlugin implements API\Plugin\PluginInterface {
 
     /**
-    *  install function
-    * @return string $message statusmessage to display in frontend
-    */
+     *  install function
+     * @return string $message statusmessage to display in frontend
+     */
     public static function install(){
         if(self::isInstalled()){
-          $statusMessage = "installed";
+            $statusMessage = "installed";
         } else {
-          $statusMessage = "not installed";
+            $statusMessage = "not installed";
         }
         return $statusMessage;
     }
@@ -48,11 +51,11 @@ class Plugin extends API\Plugin\AbstractPlugin implements API\Plugin\PluginInter
     }
 
     /**
-    * uninstall function
-    * @return string $messaget status message to display in frontend
-    */
-	public static function uninstall(){
-		return "uninstall not necessary";
+     * uninstall function
+     * @return string $messaget status message to display in frontend
+     */
+    public static function uninstall(){
+        return "uninstall not necessary";
     }
 
 
