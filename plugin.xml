@@ -21,6 +21,7 @@
         <pluginIncludePaths>
             <path>/DynamicdropdownPlugin/lib</path>
             <path>/DynamicdropdownPlugin/controllers</path>
+            <path>/DynamicdropdownPlugin/models</path>
         </pluginIncludePaths>
         <!-- namespaces to register with autoloader-->
         <pluginNamespaces>
