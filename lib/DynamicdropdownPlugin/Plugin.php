@@ -16,11 +16,23 @@
 namespace DynamicdropdownPlugin;
 
 use Pimcore\API;
+use Pimcore\Loader\ClassMapAutoloader;
 
 /**
  * Class \DynamicdropdownPlugin\Plugin
  */
 class Plugin extends API\Plugin\AbstractPlugin implements API\Plugin\PluginInterface {
+
+
+    public function init()
+    {
+        parent::init();
+        
+        //add backward compatibility for older classnames
+        $classMapAutoloader = new ClassMapAutoloader(PIMCORE_PLUGINS_PATH . "DynamicDropdown/autoload-classmap.php");
+        $classMapAutoloader->register();
+    }
+
 
     /**
      *  install function
