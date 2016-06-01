@@ -27,9 +27,9 @@ class Plugin extends API\Plugin\AbstractPlugin implements API\Plugin\PluginInter
     public function init()
     {
         parent::init();
-        
+
         //add backward compatibility for older classnames
-        $classMapAutoloader = new ClassMapAutoloader(PIMCORE_PLUGINS_PATH . "DynamicDropdown/autoload-classmap.php");
+        $classMapAutoloader = new ClassMapAutoloader(PIMCORE_PLUGINS_PATH . "/DynamicDropdown/autoload-classmap.php");
         $classMapAutoloader->register();
     }
 
